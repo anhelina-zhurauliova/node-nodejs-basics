@@ -1,12 +1,11 @@
 import { rm } from "fs/promises";
 import { existsSync } from "fs";
-import { dirname, join } from "path";
-import { FSError } from "../utils/error.js";
-import { fileURLToPath } from "url";
+import { join } from "path";
 
-// TODO: move to the util fn
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { FSError } from "../utils/error.js";
+import { getCurrentDirectory } from "../utils/getCurrentDir.js";
+
+const __dirname = getCurrentDirectory(import.meta.url);
 
 const remove = async () => {
   const fileToRemove = join(__dirname, "files", "fileToRemove.txt");
