@@ -16,7 +16,6 @@ const read = async () => {
   });
 
   readableStream.on("data", (chunk) => {
-    console.log("chunk", chunk);
     data += chunk;
   });
 
