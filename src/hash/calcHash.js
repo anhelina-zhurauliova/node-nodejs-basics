@@ -1,23 +1,26 @@
 import crypto from "crypto";
-import { readFile } from "fs/promises";
+import { Transform } from "stream";
+import { createReadStream } from "fs";
 import { join } from "path";
 
 import { getCurrentDirectory } from "../utils/getCurrentDir.js";
 
 const __dirname = getCurrentDirectory(import.meta.url);
 
-const calculateHash = async () =>
-  readFile(join(__dirname, "files", "fileToCalculateHashFor.txt"), "utf8").then(
-    (fileContent) => {
-      const hash = crypto
-        .createHash("sha256")
-        .update(fileContent)
-        .digest("hex");
+const hashFn = new Transform({
+  transform(chunk, encoding, callback) {
+    callback(
+      null,
+      crypto.createHash("sha256").update(chunk).digest("hex") + "\n"
+    );
+  },
+});
 
-      console.log("hash:", hash);
+const calculateHash = async () => {
+  const fileToHash = join(__dirname, "files", "fileToCalculateHashFor.txt");
+  const readableStream = createReadStream(fileToHash, { encoding: "utf8" });
 
-      return hash;
-    }
-  );
+  readableStream.pipe(hashFn).pipe(process.stdout);
+};
 
 await calculateHash();
